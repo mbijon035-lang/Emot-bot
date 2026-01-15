@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Password Unlock App</title>
+
+<!-- Monetag -->
+<script src='//libtl.com/sdk.js' data-zone='10466254' data-sdk='show_10466254'></script>
+
+<style>
+body{
+    background:#000;
+    color:#fff;
+    font-family:monospace;
+    padding:10px;
+    overflow-x:hidden;
+}
+.neon-text{color:#00ff00;text-shadow:0 0 5px #00ff00}
+.neon-btn{
+    background:linear-gradient(135deg,#00ff00,#009900);
+    color:#000;
+    border:none;
+    padding:14px 26px;
+    border-radius:50px;
+    font-weight:bold;
+    cursor:pointer;
+    font-size:16px;
+}
+.neon-btn:disabled{
+    background:#333;color:#777;cursor:not-allowed;
+}
+.container{max-width:500px;margin:auto;text-align:center}
+.progress-container{width:200px;height:200px;margin:25px auto}
+.progress-circle{
+    width:100%;height:100%;
+    border-radius:50%;
+    background:rgba(0,30,0,.6);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    border:5px solid rgba(0,255,0,.1)
+}
+.progress-percent{font-size:36px;font-weight:bold}
+.password-container{
+    display:none;
+    margin-top:25px;
+    padding:15px;
+    background:rgba(0,30,0,.5);
+    border-radius:10px
+}
+.password-box{
+    background:#000;
+    padding:12px;
+    margin:10px 0;
+    border-left:3px solid #00ff00
+}
+.notification{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#00ff00;
+    color:#000;
+    padding:12px 20px;
+    border-radius:10px;
+    display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="notification" class="notification"></div>
+
+<div class="container">
+    <h1 class="neon-text">PASSWORD UNLOCKER</h1>
+    <p class="neon-text">Watch 10 Ads</p>
+
+    <div class="progress-container">
+        <div class="progress-circle" id="circle">
+            <div class="progress-percent" id="percent">0%</div>
+            <div id="status">LOCKED</div>
+        </div>
+    </div>
+
+    <p>Ads watched: <span class="neon-text" id="ads">0</span>/10</p>
+
+    <button class="neon-btn" id="adBtn">WATCH AD</button>
+
+    <div class="password-container" id="passBox">
+        <h3 class="neon-text">UNLOCKED PASSWORDS</h3>
+        <div class="password-box">YT PASS ⏩ <b>B25</b></div>
+        <div class="password-box">TL PASS ⏩ <b>B25</b></div>
+    </div>
+</div>
+
+<script>
+let adsWatched = 0;
+const adBtn = document.getElementById("adBtn");
+const adsEl = document.getElementById("ads");
+const percentEl = document.getElementById("percent");
+const statusEl = document.getElementById("status");
+const passBox = document.getElementById("passBox");
+const notify = document.getElementById("notification");
+
+function showNotify(msg){
+    notify.innerText = msg;
+    notify.style.display="block";
+    setTimeout(()=>notify.style.display="none",3000);
+}
+
+function updateUI(){
+    adsEl.innerText = adsWatched;
+    percentEl.innerText = (adsWatched*10)+"%";
+    document.getElementById("circle").style.border =
+        `5px solid rgba(0,255,0,${adsWatched/10})`;
+
+    if(adsWatched>=10){
+        statusEl.innerText="UNLOCKED";
+        passBox.style.display="block";
+        adBtn.disabled=true;
+        adBtn.innerText="COMPLETED";
+    }
+}
+
+function watchAd(){
+    if(adsWatched>=10) return;
+
+    adBtn.disabled=true;
+    adBtn.innerText="AD PLAYING...";
+
+    if(typeof show_10466254!=="function"){
+        showNotify("Ad not ready");
+        adBtn.disabled=false;
+        return;
+    }
+
+    show_10466254();
+
+    let completed=false;
+    const start=Date.now();
+
+    const check=setInterval(()=>{
+        if(Date.now()-start>=7000){
+            completed=true;
+            clearInterval(check);
+            adsWatched++;
+            updateUI();
+            showNotify("Ad Completed ✅");
+            adBtn.disabled=false;
+            adBtn.innerText="WATCH AD";
+        }
+    },500);
+
+    setTimeout(()=>{
+        if(!completed){
+            clearInterval(check);
+            showNotify("Ad not completed ❌");
+            adBtn.disabled=false;
+            adBtn.innerText="WATCH AD";
+        }
+    },9000);
+}
+
+adBtn.addEventListener("click",watchAd);
+updateUI();
+</script>
+
+</body>
+</html>
